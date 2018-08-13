@@ -1,0 +1,9 @@
+[package]
+name = "pistoncore-libnx-rs_window"
+version = "0.1.0"
+authors = ["ischeinkman <scheinkman.ilan@gmail.com>"]
+
+[dependencies]
+libnx-rs = {git = "https://github.com/ischeinkman/libnx-rs"}
+pistoncore-input = "0.21.0"
+pistoncore-window = "0.32.0"
