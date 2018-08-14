@@ -60,7 +60,7 @@ pub enum LibnxKeyState {
 /// id's returned from these events, due to piston requiring the id to fit in a u8. 
 /// In addition, since piston has no concept of "holding" a key at the moment, 
 /// a state of LibnxKeyState::Held produces no events. This may change in the future, however.
-pub fn parse_key_events(controller : i32, state : LibnxKeyState, keys : u32) -> Vec<Event> {
+pub fn parse_key_events(controller : i32, state : LibnxKeyState, keys : u32) -> Vec<Input> {
 
     let mut retval = Vec::new();
     
@@ -74,7 +74,7 @@ pub fn parse_key_events(controller : i32, state : LibnxKeyState, keys : u32) -> 
             continue;
         }
         let button = idx + 1; 
-        let nevent = Event::Input(Input::Button(parse_args(controller, state, button)));
+        let nevent = Input::Button(parse_args(controller, state, button));
         retval.push(nevent);
     }
     retval
