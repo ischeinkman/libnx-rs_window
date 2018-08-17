@@ -1,15 +1,23 @@
+
+// TODO: make this dependent on whether libnx-rs is loaded
+// from the sysroot
+#![feature(rustc_private)]
+
 extern crate libnx_rs;
 extern crate window; 
 extern crate input; 
 
 use libnx_rs::libnx;
+use libnx_rs::libnx::{HidControllerID, hidScanInput};
 
 use window::{BuildFromWindowSettings, Window, WindowSettings, Size, Position};
 use input::Input;
 use std::vec::Vec;
 use std::time::{Duration, Instant};
 
-use controller;
+mod controller;
+
+pub use controller::LibnxButtonId;
 
 pub struct NxFullWindow {
     size : Size, 
@@ -26,7 +34,7 @@ impl NxFullWindow {
         let mut height : u32 = 0;
 
         let framebuffer = unsafe {
-            libnx::gfxGetFramebuffer(&width as *mut u32, &height as *mut u32)
+            (libnx::gfxGetFramebuffer(&mut width as *mut u32, &mut height as *mut u32)) as *mut u32 as *mut u8
         };
 
         let sz = Size {width, height};
@@ -40,19 +48,24 @@ impl NxFullWindow {
     }
 
     fn check_inputs(&mut self) {
-        hidScanInput();
+        unsafe { 
+            hidScanInput();
+            let kDown = libnx::hidKeysDown(HidControllerID::CONTROLLER_P1_AUTO) as u32;
+            let parse_events_d = controller::parse_key_events(1, controller::LibnxKeyState::Down, kDown);
+            self.event_backlog.extend(parse_events_d);
 
-        let kDown = libnx::hidKeysDown(HidControllerID::CONTROLLER_P1_AUTO) as u32;
-        let parse_events_d = controller::parse_key_events(1, controller::LibnxKeyState::Down, kDown);
-        self.event_backlog.extend(parse_events_d);
+            let kUp = libnx::hidKeysUp(HidControllerID::CONTROLLER_P1_AUTO) as u32;
+            let parse_events_u = controller::parse_key_events(1, controller::LibnxKeyState::Up, kUp);
+            self.event_backlog.extend(parse_events_u);
 
-        let kUp = libnx::hidKeysUp(HidControllerID::CONTROLLER_P1_AUTO) as u32;
-        let parse_events_u = controller::parse_key_events(1, controller::LibnxKeyState::Up, kUp);
-        self.event_backlog.extend(parse_events_u);
+            let kHeld = libnx::hidKeysHeld(HidControllerID::CONTROLLER_P1_AUTO) as u32;
+            let parse_events_h = controller::parse_key_events(1, controller::LibnxKeyState::Held, kHeld);
+            self.event_backlog.extend(parse_events_h);
+        }
+    }
 
-        let kHeld = libnx::hidKeysHeld(HidControllerID::CONTROLLER_P1_AUTO) as u32;
-        let parse_events_h = controller::parse_key_events(1, controller::LibnxKeyState::Held, kHeld);
-        self.event_backlog.extend(parse_events_h);
+    pub unsafe fn get_framebuffer(&mut self) -> *mut u8 {
+        *(&mut self.framebuffer as *mut *mut u8)
     }
 }
 
@@ -71,7 +84,7 @@ impl BuildFromWindowSettings for NxFullWindow {
 
 impl Window for NxFullWindow {
     fn set_should_close(&mut self, value : bool) {
-        self.should_close() = value;
+        self.should_close = value;
     }
 
     fn should_close(&self) -> bool {
@@ -94,7 +107,7 @@ impl Window for NxFullWindow {
         loop {
             let evt = self.poll_event();
             if evt.is_some() {
-                return evt;
+                return evt.unwrap();
             }
         }
     }

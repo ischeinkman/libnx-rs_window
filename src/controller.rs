@@ -1,10 +1,10 @@
 
 
 
-use input::{HatState, ControllerButton, ControllerHat, Event, Input, ButtonArgs, Button, HatState, ButtonState};
+use input::{HatState, ControllerButton, ControllerHat, Event, Input, ButtonArgs, Button, ButtonState};
 use libnx_rs::libnx::{HidControllerKeys};
 
-pub struct LibnxButtonId {};
+pub struct LibnxButtonId {}
 
 /// Constants for possible values of the event 
 impl LibnxButtonId {
@@ -89,9 +89,9 @@ fn parse_args(controller : i32, state : LibnxKeyState, button : u8) -> ButtonArg
         _ => ButtonState::Press
     };
     ButtonArgs {
-        argState, 
-        btn, 
-        None
+        state : argState, 
+        button : btn, 
+        scancode : None
     }
 }
 
@@ -104,12 +104,12 @@ fn parse_button(controller : i32, button : u8) -> Button {
 
 #[inline]
 fn parse_button_event(controller : i32, button : u8) -> ControllerButton {
-    ControllerButton::new(id, button)
+    ControllerButton::new(controller, button)
 }
 
 #[inline]
 fn parse_hat_event(controller : i32, button : u8) -> Option<ControllerHat> {
-    if button < 13 || buton > 24 {
+    if button < 13 || button > 24 {
         None
     }
     else {
@@ -122,6 +122,6 @@ fn parse_hat_event(controller : i32, button : u8) -> Option<ControllerHat> {
             
             _ => return None //Should be mathematically impossible
         };
-        ControllerHat::new(controller, button, state)
+        Some(ControllerHat::new(controller, button, state))
     }
 }
