@@ -1,8 +1,6 @@
 
 // TODO: make this dependent on whether libnx-rs is loaded
 // from the sysroot
-#![feature(rustc_private)]
-
 extern crate libnx_rs;
 extern crate window; 
 extern crate input; 

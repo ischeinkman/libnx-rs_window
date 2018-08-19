@@ -7,6 +7,6 @@ authors = ["ischeinkman <scheinkman.ilan@gmail.com>"]
 name = "libnx_rs_window"
 
 [dependencies]
-libnx-rs = {git = "https://github.com/ischeinkman/libnx-rs", optional = true}
+libnx-rs = {git = "https://github.com/ischeinkman/libnx-rs"}
 pistoncore-input = "0.21.0"
 pistoncore-window = "0.32.0"
