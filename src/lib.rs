@@ -123,6 +123,7 @@ impl Window for NxFullWindow {
             if evt.is_some() {
                 return evt;
             }
+            t_cur = Instant::now();
         }
         None
     }
