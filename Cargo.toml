@@ -10,3 +10,4 @@ name = "libnx_rs_window"
 libnx-rs = {git = "https://github.com/ischeinkman/libnx-rs"}
 pistoncore-input = "0.21.0"
 pistoncore-window = "0.32.0"
+egl = { git = "https://github.com/ischeinkman/rust-egl" }
